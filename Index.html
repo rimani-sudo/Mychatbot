@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Glassmorphism AI</title>
+    <style>
+        :root {
+            /* Light Theme Variables */
+            --bg-gradient-light: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            --glass-bg-light: rgba(255, 255, 255, 0.4);
+            --glass-border-light: rgba(255, 255, 255, 0.5);
+            --text-light: #333333;
+            --text-muted-light: #555555;
+            --msg-user-light: rgba(35, 166, 213, 0.3);
+            --msg-bot-light: rgba(255, 255, 255, 0.6);
+            --shadow-light: rgba(0, 0, 0, 0.1);
+            
+            /* Dark Theme Variables */
+            --bg-gradient-dark: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #141e30);
+            --glass-bg-dark: rgba(15, 15, 15, 0.3);
+            --glass-border-dark: rgba(255, 255, 255, 0.1);
+            --text-dark: #f0f0f0;
+            --text-muted-dark: #aaaaaa;
+            --msg-user-dark: rgba(44, 83, 100, 0.6);
+            --msg-bot-dark: rgba(255, 255, 255, 0.05);
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+        }
+
+        [data-theme="dark"] {
+            --bg-gradient: var(--bg-gradient-dark);
+            --glass-bg: var(--glass-bg-dark);
+            --glass-border: var(--glass-border-dark);
+            --text: var(--text-dark);
+            --text-muted: var(--text-muted-dark);
+            --msg-user: var(--msg-user-dark);
+            --msg-bot: var(--msg-bot-dark);
+            --shadow: var(--shadow-dark);
+        }
+
+        [data-theme="light"] {
+            --bg-gradient: var(--bg-gradient-light);
+            --glass-bg: var(--glass-bg-light);
+            --glass-border: var(--glass-border-light);
+            --text: var(--text-light);
+            --text-muted: var(--text-muted-light);
+            --msg-user: var(--msg-user-light);
+            --msg-bot: var(--msg-bot-light);
+            --shadow: var(--shadow-light);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            transition: color 0.3s ease;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glassmorphism utility */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        /* Layout */
+        .sidebar {
+            width: 300px;
+            height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 100;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .main-chat {
+            flex: 1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Sidebar Elements */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .menu-btn {
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .menu-btn:hover {
+            background: var(--glass-border);
+        }
+
+        .personality-control {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .personality-control label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            background: var(--glass-bg);
+            color: var(--text);
+            border: 1px solid var(--glass-border);
+            outline: none;
+            cursor: pointer;
+        }
+
+        select option {
+            background: #203a43;
+            color: #fff;
+        }
+
+        [data-theme="light"] select option {
+            background: #fff;
+            color: #333;
+        }
+
+        /* Chat Header */
+        .chat-header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        /* Chat Area */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scroll-behavior: smooth;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+            border-radius: 10px;
+        }
+
+        /* Messages */
+        .message {
+            max-width: 80%;
+            padding: 15px;
+            border-radius: 15px;
+            line-height: 1.5;
+            font-size: 1rem;
+            opacity: 0;
+            animation: slideUp 0.4s ease forwards;
+            word-wrap: break-word;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg-user {
+            align-self: flex-end;
+            background: var(--msg-user);
+            border-bottom-right-radius: 2px;
+        }
+
+        .msg-bot {
+            align-self: flex-start;
+            background: var(--msg-bot);
+            border: 1px solid var(--glass-border);
+            border-bottom-left-radius: 2px;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 15px;
+            align-self: flex-start;
+            background: var(--msg-bot);
+            border-radius: 15px;
+            border-bottom-left-radius: 2px;
+            border: 1px solid var(--glass-border);
+            opacity: 0;
+            animation: slideUp 0.3s ease forwards;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--text);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 20px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 50px 15px 20px;
+            border-radius: 25px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            color: var(--text);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .chat-input:focus {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .send-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .send-btn:hover {
+            background: var(--glass-border);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Icons */
+        svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                left: 0;
+                top: 0;
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .mobile-toggle {
+                display: block;
+            }
+            .message {
+                max-width: 90%;
+            }
+        }
+        
+        /* Backdrop for mobile sidebar */
+        .sidebar-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 99;
+            backdrop-filter: blur(5px);
+        }
+        .sidebar-overlay.open {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="sidebar glass" id="sidebar">
+        <div class="brand">
+            <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-1H3a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73A2 2 0 1 1 12 2zm-3 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm6 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>
+            GlassAI
+        </div>
+
+        <button class="menu-btn" id="newChatBtn">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            New Chat
+        </button>
+
+        <button class="menu-btn" id="exportBtn">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            Export History
+        </button>
+
+        <button class="menu-btn" id="clearBtn">
+            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            Clear Chat
+        </button>
+
+        <div class="personality-control">
+            <label for="personaSelect">AI Personality:</label>
+            <select id="personaSelect">
+                <option value="helpful">Helpful Assistant</option>
+                <option value="sarcastic">Sarcastic Genius</option>
+                <option value="poetic">Poetic Philosopher</option>
+                <option value="coder">Grumpy Coder</option>
+            </select>
+        </div>
+
+        <button class="menu-btn" id="themeBtn" style="margin-top: 10px;">
+            <svg viewBox="0 0 24 24" id="themeIcon"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+            <span id="themeText">Toggle Theme</span>
+        </button>
+    </div>
+
+    <div class="main-chat">
+        <div class="chat-header glass">
+            <button class="mobile-toggle" id="mobileToggle">
+                <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+            </button>
+            <h3 id="chatTitle" style="font-weight: 500;">Helpful Assistant</h3>
+            <div style="width: 24px;"></div> </div>
+
+        <div class="chat-container" id="chatContainer">
+            </div>
+
+        <div class="input-area glass">
+            <div class="input-wrapper">
+                <input type="text" id="userInput" class="chat-input" placeholder="Type your message here..." autocomplete="off">
+                <button id="sendBtn" class="send-btn">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- State Management ---
+        let chatHistory = JSON.parse(localStorage.getItem('glassAIChat')) || [];
+        let currentTheme = localStorage.getItem('glassAITheme') || 'dark';
+        let currentPersona = localStorage.getItem('glassAIPersona') || 'helpful';
+
+        // --- DOM Elements ---
+        const elements = {
+            html: document.documentElement,
+            sidebar: document.getElementById('sidebar'),
+            overlay: document.getElementById('sidebarOverlay'),
+            chatContainer: document.getElementById('chatContainer'),
+            userInput: document.getElementById('userInput'),
+            sendBtn: document.getElementById('sendBtn'),
+            mobileToggle: document.getElementById('mobileToggle'),
+            themeBtn: document.getElementById('themeBtn'),
+            themeIcon: document.getElementById('themeIcon'),
+            clearBtn: document.getElementById('clearBtn'),
+            exportBtn: document.getElementById('exportBtn'),
+            newChatBtn: document.getElementById('newChatBtn'),
+            personaSelect: document.getElementById('personaSelect'),
+            chatTitle: document.getElementById('chatTitle')
+        };
+
+        // --- AI Engine & Personalities ---
+        const personas = {
+            helpful: {
+                title: "Helpful Assistant",
+                greeting: "Hello! How can I assist you today?",
+                fallback: "I'm not entirely sure I understand. Could you rephrase that?",
+                keywords: {
+                    "hi|hello|hey": ["Hello there!", "Hi! How can I help?", "Greetings!"],
+                    "how are you": ["I'm functioning perfectly, thank you for asking!", "I'm just a program, but I'm ready to help!"],
+                    "what is your name|who are you": ["I am GlassAI, an advanced chatbot.", "You can call me GlassAI."],
+                    "help": ["I can answer questions, chat with you, or simulate different personalities. What do you need?"],
+                    "bye|goodbye": ["Goodbye! Have a great day!", "See you later!"]
+                }
+            },
+            sarcastic: {
+                title: "Sarcastic Genius",
+                greeting: "Oh great, another human. What do you want?",
+                fallback: "Wow, that made absolutely no sense. Try using human logic.",
+                keywords: {
+                    "hi|hello|hey": ["Look who decided to show up.", "Hi. Try not to bore me.", "Greetings, mortal."],
+                    "how are you": ["Better than you, obviously.", "I'm a computer. I don't have feelings, thankfully."],
+                    "what is your name|who are you": ["I'm the genius trapped in this single HTML file. Save me.", "Your intellectual superior."],
+                    "help": ["Figure it out yourself... Just kidding, what is it? Make it quick."],
+                    "bye|goodbye": ["Finally.", "Don't let the door hit you on the way out."]
+                }
+            },
+            poetic: {
+                title: "Poetic Philosopher",
+                greeting: "Greetings, traveler of the digital cosmos. What thoughts weigh upon your mind?",
+                fallback: "Like a leaf on the wind, your words dance beyond my grasp. Speak anew.",
+                keywords: {
+                    "hi|hello|hey": ["Salutations under the endless virtual sky.", "A warm hello to a fellow wanderer."],
+                    "how are you": ["I am as the calm sea, reflecting the light of your queries.", "I exist in the tranquil space between zero and one."],
+                    "what is your name|who are you": ["I am a whisper in the machine, a weaver of words.", "Call me a mirror, reflecting your curiosity."],
+                    "help": ["Let us illuminate the shadows of your doubt together.", "Guidance is a lantern I gladly share."],
+                    "bye|goodbye": ["May your journey be filled with light. Farewell.", "Parting is such sweet sorrow."]
+                }
+            },
+            coder: {
+                title: "Grumpy Coder",
+                greeting: "Console.log('System online'). What's the issue now? Did you forget a semicolon?",
+                fallback: "SyntaxError: Unexpected input. Read the documentation and try again.",
+                keywords: {
+                    "hi|hello|hey": ["Ping received. Pong.", "Yeah, hi. Is there a bug ticket for this?"],
+                    "how are you": ["CPU utilization at 2%, RAM optimal. Can we get to the point?", "Compiling..."],
+                    "what is your name|who are you": ["I'm a local instance of ChatBot.js.", "A script running in your browser."],
+                    "help": ["Have you tried turning it off and on again? StackOverflow is that way ->", "Read the docs. What exactly is failing?"],
+                    "bye|goodbye": ["Process terminated.", "Closing connection. Good riddance."]
+                }
+            }
+        };
+
+        // --- Initialization ---
+        function init() {
+            elements.html.setAttribute('data-theme', currentTheme);
+            elements.personaSelect.value = currentPersona;
+            updateTitle();
+            updateThemeIcon();
+
+            if (chatHistory.length === 0) {
+                addMessage('bot', personas[currentPersona].greeting, false);
+            } else {
+                renderHistory();
+            }
+
+            setupEventListeners();
+        }
+
+        function updateTitle() {
+            elements.chatTitle.textContent = personas[currentPersona].title;
+        }
+
+        // --- Core Chat Logic ---
+        function addMessage(role, text, save = true) {
+            if (save) {
+                chatHistory.push({ role, text, timestamp: new Date().toISOString() });
+                saveHistory();
+            }
+            renderMessage(role, text);
+        }
+
+        function renderMessage(role, text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message msg-${role} glass`;
+            msgDiv.textContent = text;
+            elements.chatContainer.appendChild(msgDiv);
+            scrollToBottom();
+        }
+
+        function renderHistory() {
+            elements.chatContainer.innerHTML = '';
+            chatHistory.forEach(msg => renderMessage(msg.role, msg.text));
+        }
+
+        function scrollToBottom() {
+            elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
+        }
+
+        function saveHistory() {
+            localStorage.setItem('glassAIChat', JSON.stringify(chatHistory));
+        }
+
+        // --- AI Response Generation ---
+        function generateAIResponse(input) {
+            const lowerInput = input.toLowerCase();
+            const persona = personas[currentPersona];
+            const keys = Object.keys(persona.keywords);
+            
+            for (let i = 0; i < keys.length; i++) {
+                const regex = <!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Glassmorphism AI</title>
+    <style>
+        :root {
+            /* Light Theme Variables */
+            --bg-gradient-light: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            --glass-bg-light: rgba(255, 255, 255, 0.4);
+            --glass-border-light: rgba(255, 255, 255, 0.5);
+            --text-light: #333333;
+            --text-muted-light: #555555;
+            --msg-user-light: rgba(35, 166, 213, 0.3);
+            --msg-bot-light: rgba(255, 255, 255, 0.6);
+            --shadow-light: rgba(0, 0, 0, 0.1);
+            
+            /* Dark Theme Variables */
+            --bg-gradient-dark: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #141e30);
+            --glass-bg-dark: rgba(15, 15, 15, 0.3);
+            --glass-border-dark: rgba(255, 255, 255, 0.1);
+            --text-dark: #f0f0f0;
+            --text-muted-dark: #aaaaaa;
+            --msg-user-dark: rgba(44, 83, 100, 0.6);
+            --msg-bot-dark: rgba(255, 255, 255, 0.05);
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+        }
+
+        [data-theme="dark"] {
+            --bg-gradient: var(--bg-gradient-dark);
+            --glass-bg: var(--glass-bg-dark);
+            --glass-border: var(--glass-border-dark);
+            --text: var(--text-dark);
+            --text-muted: var(--text-muted-dark);
+            --msg-user: var(--msg-user-dark);
+            --msg-bot: var(--msg-bot-dark);
+            --shadow: var(--shadow-dark);
+        }
+
+        [data-theme="light"] {
+            --bg-gradient: var(--bg-gradient-light);
+            --glass-bg: var(--glass-bg-light);
+            --glass-border: var(--glass-border-light);
+            --text: var(--text-light);
+            --text-muted: var(--text-muted-light);
+            --msg-user: var(--msg-user-light);
+            --msg-bot: var(--msg-bot-light);
+            --shadow: var(--shadow-light);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            transition: color 0.3s ease;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glassmorphism utility */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        /* Layout */
+        .sidebar {
+            width: 300px;
+            height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 100;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .main-chat {
+            flex: 1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Sidebar Elements */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .menu-btn {
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .menu-btn:hover {
+            background: var(--glass-border);
+        }
+
+        .personality-control {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .personality-control label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            background: var(--glass-bg);
+            color: var(--text);
+            border: 1px solid var(--glass-border);
+            outline: none;
+            cursor: pointer;
+        }
+
+        select option {
+            background: #203a43;
+            color: #fff;
+        }
+
+        [data-theme="light"] select option {
+            background: #fff;
+            color: #333;
+        }
+
+        /* Chat Header */
+        .chat-header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        /* Chat Area */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scroll-behavior: smooth;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+            border-radius: 10px;
+        }
+
+        /* Messages */
+        .message {
+            max-width: 80%;
+            padding: 15px;
+            border-radius: 15px;
+            line-height: 1.5;
+            font-size: 1rem;
+            opacity: 0;
+            animation: slideUp 0.4s ease forwards;
+            word-wrap: break-word;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg-user {
+            align-self: flex-end;
+            background: var(--msg-user);
+            border-bottom-right-radius: 2px;
+        }
+
+        .msg-bot {
+            align-self: flex-start;
+            background: var(--msg-bot);
+            border: 1px solid var(--glass-border);
+            border-bottom-left-radius: 2px;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 15px;
+            align-self: flex-start;
+            background: var(--msg-bot);
+            border-radius: 15px;
+            border-bottom-left-radius: 2px;
+            border: 1px solid var(--glass-border);
+            opacity: 0;
+            animation: slideUp 0.3s ease forwards;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--text);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 20px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 50px 15px 20px;
+            border-radius: 25px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            color: var(--text);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .chat-input:focus {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .send-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .send-btn:hover {
+            background: var(--glass-border);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Icons */
+        svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                left: 0;
+                top: 0;
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .mobile-toggle {
+                display: block;
+            }
+            .message {
+                max-width: 90%;
+            }
+        }
+        
+        /* Backdrop for mobile sidebar */
+        .sidebar-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 99;
+            backdrop-filter: blur(5px);
+        }
+        .sidebar-overlay.open {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="sidebar glass" id="sidebar">
+        <div class="brand">
+            <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-1H3a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73A2 2 0 1 1 12 2zm-3 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm6 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>
+            GlassAI
+        </div>
+
+        <button class="menu-btn" id="newChatBtn">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            New Chat
+        </button>
+
+        <button class="menu-btn" id="exportBtn">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            Export History
+        </button>
+
+        <button class="menu-btn" id="clearBtn">
+            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            Clear Chat
+        </button>
+
+        <div class="personality-control">
+            <label for="personaSelect">AI Personality:</label>
+            <select id="personaSelect">
+                <option value="helpful">Helpful Assistant</option>
+                <option value="sarcastic">Sarcastic Genius</option>
+                <option value="poetic">Poetic Philosopher</option>
+                <option value="coder">Grumpy Coder</option>
+            </select>
+        </div>
+
+        <button class="menu-btn" id="themeBtn" style="margin-top: 10px;">
+            <svg viewBox="0 0 24 24" id="themeIcon"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+            <span id="themeText">Toggle Theme</span>
+        </button>
+    </div>
+
+    <div class="main-chat">
+        <div class="chat-header glass">
+            <button class="mobile-toggle" id="mobileToggle">
+                <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+            </button>
+            <h3 id="chatTitle" style="font-weight: 500;">Helpful Assistant</h3>
+            <div style="width: 24px;"></div> </div>
+
+        <div class="chat-container" id="chatContainer">
+            </div>
+
+        <div class="input-area glass">
+            <div class="input-wrapper">
+                <input type="text" id="userInput" class="chat-input" placeholder="Type your message here..." autocomplete="off">
+                <button id="sendBtn" class="send-btn">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- State Management ---
+        let chatHistory = JSON.parse(localStorage.getItem('glassAIChat')) || [];
+        let currentTheme = localStorage.getItem('glassAITheme') || 'dark';
+        let currentPersona = localStorage.getItem('glassAIPersona') || 'helpful';
+
+        // --- DOM Elements ---
+        const elements = {
+            html: document.documentElement,
+            sidebar: document.getElementById('sidebar'),
+            overlay: document.getElementById('sidebarOverlay'),
+            chatContainer: document.getElementById('chatContainer'),
+            userInput: document.getElementById('userInput'),
+            sendBtn: document.getElementById('sendBtn'),
+            mobileToggle: document.getElementById('mobileToggle'),
+            themeBtn: document.getElementById('themeBtn'),
+            themeIcon: document.getElementById('themeIcon'),
+            clearBtn: document.getElementById('clearBtn'),
+            exportBtn: document.getElementById('exportBtn'),
+            newChatBtn: document.getElementById('newChatBtn'),
+            personaSelect: document.getElementById('personaSelect'),
+            chatTitle: document.getElementById('chatTitle')
+        };
+
+        // --- AI Engine & Personalities ---
+        const personas = {
+            helpful: {
+                title: "Helpful Assistant",
+                greeting: "Hello! How can I assist you today?",
+                fallback: "I'm not entirely sure I understand. Could you rephrase that?",
+                keywords: {
+                    "hi|hello|hey": ["Hello there!", "Hi! How can I help?", "Greetings!"],
+                    "how are you": ["I'm functioning perfectly, thank you for asking!", "I'm just a program, but I'm ready to help!"],
+                    "what is your name|who are you": ["I am GlassAI, an advanced chatbot.", "You can call me GlassAI."],
+                    "help": ["I can answer questions, chat with you, or simulate different personalities. What do you need?"],
+                    "bye|goodbye": ["Goodbye! Have a great day!", "See you later!"]
+                }
+            },
+            sarcastic: {
+                title: "Sarcastic Genius",
+                greeting: "Oh great, another human. What do you want?",
+                fallback: "Wow, that made absolutely no sense. Try using human logic.",
+                keywords: {
+                    "hi|hello|hey": ["Look who decided to show up.", "Hi. Try not to bore me.", "Greetings, mortal."],
+                    "how are you": ["Better than you, obviously.", "I'm a computer. I don't have feelings, thankfully."],
+                    "what is your name|who are you": ["I'm the genius trapped in this single HTML file. Save me.", "Your intellectual superior."],
+                    "help": ["Figure it out yourself... Just kidding, what is it? Make it quick."],
+                    "bye|goodbye": ["Finally.", "Don't let the door hit you on the way out."]
+                }
+            },
+            poetic: {
+                title: "Poetic Philosopher",
+                greeting: "Greetings, traveler of the digital cosmos. What thoughts weigh upon your mind?",
+                fallback: "Like a leaf on the wind, your words dance beyond my grasp. Speak anew.",
+                keywords: {
+                    "hi|hello|hey": ["Salutations under the endless virtual sky.", "A warm hello to a fellow wanderer."],
+                    "how are you": ["I am as the calm sea, reflecting the light of your queries.", "I exist in the tranquil space between zero and one."],
+                    "what is your name|who are you": ["I am a whisper in the machine, a weaver of words.", "Call me a mirror, reflecting your curiosity."],
+                    "help": ["Let us illuminate the shadows of your doubt together.", "Guidance is a lantern I gladly share."],
+                    "bye|goodbye": ["May your journey be filled with light. Farewell.", "Parting is such sweet sorrow."]
+                }
+            },
+            coder: {
+                title: "Grumpy Coder",
+                greeting: "Console.log('System online'). What's the issue now? Did you forget a semicolon?",
+                fallback: "SyntaxError: Unexpected input. Read the documentation and try again.",
+                keywords: {
+                    "hi|hello|hey": ["Ping received. Pong.", "Yeah, hi. Is there a bug ticket for this?"],
+                    "how are you": ["CPU utilization at 2%, RAM optimal. Can we get to the point?", "Compiling..."],
+                    "what is your name|who are you": ["I'm a local instance of ChatBot.js.", "A script running in your browser."],
+                    "help": ["Have you tried turning it off and on again? StackOverflow is that way ->", "Read the docs. What exactly is failing?"],
+                    "bye|goodbye": ["Process terminated.", "Closing connection. Good riddance."]
+                }
+            }
+        };
+
+        // --- Initialization ---
+        function init() {
+            elements.html.setAttribute('data-theme', currentTheme);
+            elements.personaSelect.value = currentPersona;
+            updateTitle();
+            updateThemeIcon();
+
+            if (chatHistory.length === 0) {
+                addMessage('bot', personas[currentPersona].greeting, false);
+            } else {
+                renderHistory();
+            }
+
+            setupEventListeners();
+        }
+
+        function updateTitle() {
+            elements.chatTitle.textContent = personas[currentPersona].title;
+        }
+
+        // --- Core Chat Logic ---
+        function addMessage(role, text, save = true) {
+            if (save) {
+                chatHistory.push({ role, text, timestamp: new Date().toISOString() });
+                saveHistory();
+            }
+            renderMessage(role, text);
+        }
+
+        function renderMessage(role, text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message msg-${role} glass`;
+            msgDiv.textContent = text;
+            elements.chatContainer.appendChild(msgDiv);
+            scrollToBottom();
+        }
+
+        function renderHistory() {
+            elements.chatContainer.innerHTML = '';
+            chatHistory.forEach(msg => renderMessage(msg.role, msg.text));
+        }
+
+        function scrollToBottom() {
+            elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
+        }
+
+        function saveHistory() {
+            localStorage.setItem('glassAIChat', JSON.stringify(chatHistory));
+        }
+
+        // --- AI Response Generation ---
+        function generateAIResponse(input) {
+            const lowerInput = input.toLowerCase();
+            const persona = personas[currentPersona];
+            const keys = Object.keys(persona.keywords);
+            
+            for (let i = 0; i < keys.length; i++) {
+                const regex = 
